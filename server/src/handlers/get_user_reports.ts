@@ -1,8 +1,21 @@
+import { db } from '../db';
+import { roadDamageReportsTable } from '../db/schema';
 import { type RoadDamageReport } from '../schema';
+import { eq, desc } from 'drizzle-orm';
 
 export async function getUserReports(userId: string): Promise<RoadDamageReport[]> {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is fetching all road damage reports created by a specific user.
-    // Should be used for user dashboard to show their report history.
-    return Promise.resolve([]);
+  try {
+    // Query all reports for the specified user, ordered by creation date (newest first)
+    const results = await db.select()
+      .from(roadDamageReportsTable)
+      .where(eq(roadDamageReportsTable.user_id, userId))
+      .orderBy(desc(roadDamageReportsTable.created_at))
+      .execute();
+
+    // Return the results - no type conversion needed as all fields are compatible
+    return results;
+  } catch (error) {
+    console.error('Failed to fetch user reports:', error);
+    throw error;
+  }
 }
